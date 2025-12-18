@@ -18,7 +18,7 @@ public class Epic extends Task {
     }
 
     public Epic(int taskUID, String name, String description, ArrayList<Subtask> subtasks) {
-        super(taskUID ,name, description);
+        super(taskUID, name, description);
         this.subtasks = new ArrayList<>(subtasks);
     }
 
@@ -74,7 +74,7 @@ public class Epic extends Task {
 
             if (inProgress) {
                 super.setStatus(TaskStatus.IN_PROGRESS);
-            } else if (allDone){
+            } else if (allDone) {
                 super.setStatus(TaskStatus.DONE);
             } else {
                 super.setStatus(TaskStatus.NEW);
