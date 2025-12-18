@@ -3,72 +3,66 @@ package tasks;
 import java.util.Objects;
 
 public class Task {
-    private static int taskCounter = 0;
-
-    private int taskUID;
+    private int id;
     private String name;
     private String description;
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     private TaskStatus status;
 
-    static private void increaseTaskCounter() {
-        taskCounter++;
-    }
-
-    private final void setTaskUID() {
-        increaseTaskCounter();
-        this.taskUID = Task.taskCounter;
-    }
-
-    public Task(String name, String description) {
-        setTaskUID();
+    public Task(int id, String name, String description) {
+        this.id = id;
         this.name = name;
         this.description = description;
         this.status = TaskStatus.NEW;
     }
 
-    public Task(String name) {
-        setTaskUID();
+    public Task(int id, String name) {
+        this.id = id;
         this.name = name;
         this.status = TaskStatus.NEW;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public TaskStatus getStatus() {
-        return status;
-    }
-
-    public int getTaskUID() {
-        return taskUID;
     }
 
     public void setStatus(TaskStatus status) {
         this.status = status;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public TaskStatus getStatus() {
+        return status;
+    }
+
+    public Task(Task t) {
+        this.id = t.id;
+        this.status = t.status;
+        this.name = t.name;
+        this.description = t.description;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return taskUID == task.taskUID;
+        return id == task.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(taskUID);
+        return Objects.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() +
+                "{id=" + id +
+                ", name='" + name + '\'' +
+                ", status=" + status +
+                '}';
     }
 }
