@@ -1,11 +1,11 @@
-package tasks;
+package tracker.model;
 
 import java.util.ArrayList;
 
 public class Epic extends Task {
     private int openSubtasks;
 
-    private ArrayList<Subtask> subtasks;
+    private final ArrayList<Subtask> subtasks;
 
     public Epic(int taskUID, String name, String description) {
         super(taskUID, name, description);
@@ -33,8 +33,12 @@ public class Epic extends Task {
         this.openSubtasks = e.openSubtasks;
     }
 
-    protected void addSubTask(Subtask s) {
+    public void addSubTask(Subtask s) {
         if (s == null) {
+            return;
+        }
+
+        if (s.getId() == this.getId()) {
             return;
         }
 
@@ -46,9 +50,10 @@ public class Epic extends Task {
         checkStatus();
     }
 
+
     public void clearSubtasks() {
         subtasks.clear();
-        checkStatus(); // станет NEW, т.к. подзадач нет
+        checkStatus();
     }
 
     public ArrayList<Subtask> getSubtasks() {
@@ -59,7 +64,7 @@ public class Epic extends Task {
         int inProgressTasks = 0;
         int doneTasks = 0;
 
-        if (subtasks.size() == 0) {
+        if (subtasks.isEmpty()) {
             super.setStatus(TaskStatus.NEW);
         } else {
             for (Subtask subtask : subtasks) {

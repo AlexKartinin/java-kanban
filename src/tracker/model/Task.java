@@ -1,10 +1,10 @@
-package tasks;
+package tracker.model;
 
 import java.util.Objects;
 
 public class Task {
     private int id;
-    private String name;
+    private final String name;
     private String description;
 
     public void setId(int id) {

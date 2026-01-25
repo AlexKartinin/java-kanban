@@ -1,20 +1,29 @@
-package tasks;
+package tracker.model;
 
 public class Subtask extends Task {
     private Epic epic;
 
     public void setEpic(Epic epic) {
+        if (epic == null) {
+            this.epic = null;
+            return;
+        }
+
+        if (epic.getId() == this.getId()) {
+            return;
+        }
+
         this.epic = epic;
     }
 
     public Subtask(int taskUID, String name, String description, Epic epic) {
         super(taskUID, name, description);
-        this.epic = epic;
+        setEpic(epic);
     }
 
     public Subtask(int taskUID, String name, Epic epic) {
         super(taskUID, name);
-        this.epic = epic;
+        setEpic(epic);
     }
 
     public Subtask(int taskUID, String name, String description) {

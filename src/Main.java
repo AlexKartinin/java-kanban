@@ -1,13 +1,14 @@
-import tasks.Epic;
-import tasks.Subtask;
-import tasks.Task;
-import tasks.TaskManager;
-import tasks.TaskStatus;
+import tracker.model.Epic;
+import tracker.model.Subtask;
+import tracker.model.Task;
+import tracker.controllers.Managers;
+import tracker.controllers.TaskManager;
+import tracker.model.TaskStatus;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager tm = new TaskManager();
+        TaskManager tm = Managers.getDefault();
 
         // 1) Создаём две задачи
         Task task1 = tm.createTask(new Task(0, "Task #1", "Simple task 1"));
@@ -22,7 +23,7 @@ public class Main {
         Epic epic2 = tm.createEpic(new Epic(0, "Epic #2", "Epic with 1 subtask"));
         Subtask epic2st1 = tm.createSubtask(new Subtask(0, "Epic2-Subtask #1", "Only subtask", epic2));
 
-        // 4) Печать списков (как требует ТЗ)
+        // 4) Печать списков
         System.out.println("=== INITIAL LISTS ===");
         System.out.println("Tasks: " + tm.getTasks());
         System.out.println("Epics: " + tm.getEpics());
@@ -32,49 +33,44 @@ public class Main {
         // 5) Меняем статусы задач и подзадач, проверяем эпики
         System.out.println("\n=== CHANGE STATUSES ===");
 
-        // задачи (их статус должен просто сохраниться)
         task1.setStatus(TaskStatus.IN_PROGRESS);
         task2.setStatus(TaskStatus.DONE);
         tm.updateTask(task1);
         tm.updateTask(task2);
 
-        // Проверка смешанного кейса для эпика: NEW + DONE => IN_PROGRESS (после фикса #2)
-        epic1st1.setStatus(TaskStatus.DONE);  // epic1 должен стать IN_PROGRESS (т.к. вторая ещё NEW)
+        epic1st1.setStatus(TaskStatus.DONE);
         System.out.println("After epic1st1 DONE (epic1 expected IN_PROGRESS):");
-        System.out.println("epic1 status = " + tm.getEpicByID(epic1.getId()).getStatus());
+        System.out.println("epic1 status = " + tm.getEpic(epic1.getId()).getStatus());
 
-        // Доведём epic1 до DONE
-        epic1st2.setStatus(TaskStatus.DONE);  // epic1 должен стать DONE
+        epic1st2.setStatus(TaskStatus.DONE);
         System.out.println("After epic1st2 DONE (epic1 expected DONE):");
-        System.out.println("epic1 status = " + tm.getEpicByID(epic1.getId()).getStatus());
+        System.out.println("epic1 status = " + tm.getEpic(epic1.getId()).getStatus());
 
-        // epic2: сделаем IN_PROGRESS, потом DONE
-        epic2st1.setStatus(TaskStatus.IN_PROGRESS); // epic2 должен стать IN_PROGRESS
+        epic2st1.setStatus(TaskStatus.IN_PROGRESS);
         System.out.println("After epic2st1 IN_PROGRESS (epic2 expected IN_PROGRESS):");
-        System.out.println("epic2 status = " + tm.getEpicByID(epic2.getId()).getStatus());
+        System.out.println("epic2 status = " + tm.getEpic(epic2.getId()).getStatus());
 
-        epic2st1.setStatus(TaskStatus.DONE); // epic2 должен стать DONE
+        epic2st1.setStatus(TaskStatus.DONE);
         System.out.println("After epic2st1 DONE (epic2 expected DONE):");
-        System.out.println("epic2 status = " + tm.getEpicByID(epic2.getId()).getStatus());
-
-        // Печать списков снова
-        System.out.println("\n=== LISTS AFTER STATUS CHANGES ===");
-        System.out.println("Tasks: " + tm.getTasks());
-        System.out.println("Epics: " + tm.getEpics());
-        System.out.println("Subtasks: " + tm.getSubtasks());
-        printStatuses(task1, task2, epic1, epic2, epic1st1, epic1st2, epic2st1);
+        System.out.println("epic2 status = " + tm.getEpic(epic2.getId()).getStatus());
 
         // 6) Удаляем одну задачу и один эпик
         System.out.println("\n=== REMOVE ONE TASK AND ONE EPIC ===");
         tm.removeTaskById(task1.getId());
-        tm.removeEpicById(epic1.getId()); // вместе с его подзадачами
+        tm.removeEpicById(epic1.getId());
 
         System.out.println("Tasks: " + tm.getTasks());
         System.out.println("Epics: " + tm.getEpics());
         System.out.println("Subtasks: " + tm.getSubtasks());
 
-        // (не обязательно, но удобно) Проверим, что подзадачи epic1 исчезли:
         System.out.println("Epic1 subtasks by manager (expected empty): " + tm.getEpicSubtasks(epic1.getId()));
+
+        // 7) История просмотров (последние 10)
+        System.out.println("\n=== HISTORY DEMO ===");
+        tm.getTask(task2.getId());
+        tm.getEpic(epic2.getId());
+        tm.getSubtask(epic2st1.getId());
+        System.out.println("History: " + tm.getHistory());
     }
 
     private static void printStatuses(Task task1, Task task2, Epic epic1, Epic epic2,
