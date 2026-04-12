@@ -53,7 +53,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private Node<Task> linkLast(Task task) {
-        Node<Task> newNode = new Node<>(tail, task, null);
+        final Node<Task> newNode = new Node<>(tail, task, null);
 
         if (head == null) {
             head = newNode;
@@ -80,9 +80,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         } else {
             next.prev = prev;
         }
-
-        node.prev = null;
-        node.next = null;
     }
 
     private List<Task> getTasks() {
