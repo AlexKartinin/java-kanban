@@ -50,7 +50,6 @@ public class Epic extends Task {
         checkStatus();
     }
 
-
     public void clearSubtasks() {
         subtasks.clear();
         checkStatus();
@@ -97,5 +96,10 @@ public class Epic extends Task {
         throw new UnsupportedOperationException(
                 "Статус Epic рассчитывается автоматически по статусам подзадач"
         );
+    }
+
+    @Override
+    public void restoreStatus(TaskStatus status) {
+        super.restoreStatus(status);
     }
 }
