@@ -54,4 +54,17 @@ public class Subtask extends Task {
         super.setStatus(status);
         updateEpic();
     }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.SUBTASK;
+    }
+
+    /**
+     * Восстановление статуса при десериализации — не пересчитывает эпик.
+     */
+    @Override
+    public void restoreStatus(TaskStatus status) {
+        super.restoreStatus(status);
+    }
 }

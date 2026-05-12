@@ -13,21 +13,55 @@ import java.util.List;
  * Менеджер задач, хранящий все данные в оперативной памяти.
  */
 public class InMemoryTaskManager implements TaskManager {
-    private static int taskCounter = 0;
+    private int taskCounter = 0;
 
-    private final HashMap<Integer, Task> tasks = new HashMap<>();
-    private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private final HashMap<Integer, Epic> epics = new HashMap<>();
+    protected final HashMap<Integer, Task> tasks = new HashMap<>();
+    protected final HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    protected final HashMap<Integer, Epic> epics = new HashMap<>();
 
-    private final HistoryManager historyManager;
+    protected final HistoryManager historyManager;
 
     public InMemoryTaskManager() {
         this.historyManager = Managers.getDefaultHistory();
     }
 
-    private int generateId() {
+    protected int generateId() {
         return ++taskCounter;
     }
+
+    /**
+     * Синхронизирует внутренний счётчик с максимальным id из загруженных данных.
+     * Нужен при восстановлении из файла.
+     */
+    protected void syncCounter(int maxId) {
+        if (maxId > taskCounter) {
+            taskCounter = maxId;
+        }
+    }
+
+    // region Restore helpers (используются при десериализации, без вызова save)
+
+    protected void restoreTask(Task task) {
+        tasks.put(task.getId(), task);
+    }
+
+    protected void restoreEpic(Epic epic) {
+        epics.put(epic.getId(), epic);
+    }
+
+    protected void restoreSubtask(Subtask subtask) {
+        subtasks.put(subtask.getId(), subtask);
+    }
+
+    protected void restoreHistory(Task task) {
+        historyManager.add(task);
+    }
+
+    protected Epic findEpicById(int id) {
+        return epics.get(id);
+    }
+
+    // endregion
 
     // region Getters
     @Override
