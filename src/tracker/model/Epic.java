@@ -99,6 +99,11 @@ public class Epic extends Task {
     }
 
     @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
+
+    @Override
     public void restoreStatus(TaskStatus status) {
         super.restoreStatus(status);
     }

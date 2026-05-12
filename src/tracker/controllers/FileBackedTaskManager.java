@@ -75,24 +75,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private static String toString(Task task) {
-        TaskType type;
         String epicId = "";
 
-        if (task instanceof Subtask subtask) {
-            type = TaskType.SUBTASK;
-            Epic epic = subtask.getEpic();
+        if (task.getType() == TaskType.SUBTASK) {
+            Epic epic = ((Subtask) task).getEpic();
             if (epic != null) {
                 epicId = String.valueOf(epic.getId());
             }
-        } else if (task instanceof Epic) {
-            type = TaskType.EPIC;
-        } else {
-            type = TaskType.TASK;
         }
 
         return String.join(",",
                 String.valueOf(task.getId()),
-                type.name(),
+                task.getType().name(),
                 task.getName(),
                 task.getStatus().name(),
                 task.getDescription(),
@@ -120,12 +114,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         String[] lines = content.split("\n");
 
-        // Первая строка — заголовок, пропускаем.
-        // Читаем задачи до пустой строки.
-        // После пустой строки — строка "history:..."
-
-        // Сначала соберём все задачи в промежуточную карту по id,
-        // чтобы потом связать подзадачи с эпиками.
         Map<Integer, Task> allById = new LinkedHashMap<>();
         boolean historySection = false;
         List<Integer> historyIds = new ArrayList<>();
@@ -156,31 +144,28 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
         }
 
-        // Восстанавливаем задачи в менеджер через внутренние карты,
-        // чтобы не вызывать save() на каждом шаге (используем метод родителя напрямую).
-        // Для этого сначала — Task и Epic (без подзадач), потом — Subtask.
+        // Сначала — Task и Epic (без подзадач), потом — Subtask
         for (Task task : allById.values()) {
-            if (task instanceof Epic epic) {
-                manager.restoreEpic(epic);
-            } else if (!(task instanceof Subtask)) {
-                manager.restoreTask(task);
+            switch (task.getType()) {
+                case EPIC -> manager.restoreEpic((Epic) task);
+                case TASK -> manager.restoreTask(task);
+                case SUBTASK -> { /* второй проход */ }
             }
         }
 
         for (Task task : allById.values()) {
-            if (task instanceof Subtask subtask) {
-                // epicId временно хранится в поле epic как «заглушка» с нужным id
-                Epic storedEpic = manager.findEpicById(subtask.getEpic().getId());
-                if (storedEpic != null) {
-                    subtask.setEpic(storedEpic);
-                    storedEpic.addSubTask(subtask);
-                }
-                manager.restoreSubtask(subtask);
+            if (task.getType() != TaskType.SUBTASK) continue;
+
+            Subtask subtask = (Subtask) task;
+            Epic storedEpic = manager.findEpicById(subtask.getEpic().getId());
+            if (storedEpic != null) {
+                subtask.setEpic(storedEpic);
+                storedEpic.addSubTask(subtask);
             }
+            manager.restoreSubtask(subtask);
         }
 
-        // Восстанавливаем историю — добавляем в HistoryManager напрямую,
-        // чтобы не создавать новые просмотры через getTask/getEpic/getSubtask
+        // Восстанавливаем историю
         for (int id : historyIds) {
             Task task = allById.get(id);
             if (task != null) {
@@ -188,7 +173,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
         }
 
-        // После полной загрузки синхронизируем счётчик id
+        // Синхронизируем счётчик id
         int maxId = allById.keySet().stream().mapToInt(Integer::intValue).max().orElse(0);
         manager.syncCounter(maxId);
 
@@ -219,12 +204,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
             case EPIC -> {
                 Epic epic = new Epic(id, name, description);
-                // Статус эпика пересчитывается по подзадачам; здесь восстанавливаем напрямую
                 epic.restoreStatus(status);
                 yield epic;
             }
             case SUBTASK -> {
-                // Создаём заглушку эпика только с id — связь восстановится позже
                 int epicId = Integer.parseInt(parts[5].strip());
                 Epic epicStub = new Epic(epicId, "", "");
                 Subtask subtask = new Subtask(id, name, description, epicStub);
@@ -313,7 +296,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
-    // getTask / getEpic / getSubtask меняют историю — тоже сохраняем
     @Override
     public Task getTask(int id) {
         Task result = super.getTask(id);

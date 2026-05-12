@@ -36,6 +36,10 @@ public class Task {
         return id;
     }
 
+    public TaskType getType() {
+        return TaskType.TASK;
+    }
+
     public String getName() {
         return name;
     }
