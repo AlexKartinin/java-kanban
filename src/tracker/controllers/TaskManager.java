@@ -66,4 +66,6 @@ public interface TaskManager {
      * История просмотров (последние 10 задач), формируется по вызовам getTask/getEpic/getSubtask.
      */
     List<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
 }
