@@ -95,13 +95,11 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private Task copy(Task task) {
-        if (task instanceof tracker.model.Subtask st) {
-            return new tracker.model.Subtask(st);
-        }
-        if (task instanceof tracker.model.Epic e) {
-            return new tracker.model.Epic(e);
-        }
-        return new Task(task);
+        return switch (task.getType()) {
+            case SUBTASK -> new tracker.model.Subtask((tracker.model.Subtask) task);
+            case EPIC -> new tracker.model.Epic((tracker.model.Epic) task);
+            case TASK -> new Task(task);
+        };
     }
 
     private static class Node<T> {
