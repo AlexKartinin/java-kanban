@@ -43,9 +43,12 @@ public class Subtask extends Task {
     }
 
     private void notifyEpic() {
-        if (epic != null) {
-            epic.recalculate();
+        if (epic == null) {
+            throw new IllegalStateException(
+                    "Subtask (id=" + getId() + ") не привязана к эпику"
+            );
         }
+        epic.recalculate();
     }
 
     @Override

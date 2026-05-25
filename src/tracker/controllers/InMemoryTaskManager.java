@@ -100,6 +100,7 @@ public class InMemoryTaskManager implements TaskManager {
      * Исключает саму задачу (по id) — для случая обновления.
      */
     protected boolean hasOverlapWithExisting(Task candidate) {
+        if (candidate.getStartTime() == null || candidate.getEndTime() == null) return false;
         return getPrioritizedTasks().stream()
                 .filter(t -> t.getId() != candidate.getId())
                 .anyMatch(t -> isOverlapping(candidate, t));
@@ -130,8 +131,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTasks() {
-        tasks.keySet().forEach(historyManager::remove);
-        tasks.values().forEach(this::removeFromPrioritized);
+        tasks.values().forEach(task -> {
+            historyManager.remove(task.getId());
+            removeFromPrioritized(task);
+        });
         tasks.clear();
     }
 
@@ -144,8 +147,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeSubtasks() {
-        subtasks.keySet().forEach(historyManager::remove);
-        subtasks.values().forEach(this::removeFromPrioritized);
+        subtasks.values().forEach(st -> {
+            historyManager.remove(st.getId());
+            removeFromPrioritized(st);
+        });
         subtasks.clear();
         epics.values().forEach(Epic::clearSubtasks);
     }
