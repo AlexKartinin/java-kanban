@@ -1,5 +1,8 @@
 package tracker.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
     private Epic epic;
 
@@ -8,11 +11,7 @@ public class Subtask extends Task {
             this.epic = null;
             return;
         }
-
-        if (epic.getId() == this.getId()) {
-            return;
-        }
-
+        if (epic.getId() == this.getId()) return;
         this.epic = epic;
     }
 
@@ -43,16 +42,31 @@ public class Subtask extends Task {
         return epic;
     }
 
-    protected void updateEpic() {
-        if (this.epic != null) {
-            this.epic.checkStatus();
+    private void notifyEpic() {
+        if (epic == null) {
+            throw new IllegalStateException(
+                    "Subtask (id=" + getId() + ") не привязана к эпику"
+            );
         }
+        epic.recalculate();
     }
 
     @Override
     public void setStatus(TaskStatus status) {
         super.setStatus(status);
-        updateEpic();
+        notifyEpic();
+    }
+
+    @Override
+    public void setDuration(Duration duration) {
+        super.setDuration(duration);
+        notifyEpic();
+    }
+
+    @Override
+    public void setStartTime(LocalDateTime startTime) {
+        super.setStartTime(startTime);
+        notifyEpic();
     }
 
     @Override
@@ -60,9 +74,6 @@ public class Subtask extends Task {
         return TaskType.SUBTASK;
     }
 
-    /**
-     * Восстановление статуса при десериализации — не пересчитывает эпик.
-     */
     @Override
     public void restoreStatus(TaskStatus status) {
         super.restoreStatus(status);
