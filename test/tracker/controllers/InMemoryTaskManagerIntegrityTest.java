@@ -2,6 +2,7 @@ package tracker.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import tracker.exceptions.NotFoundException;
 import tracker.model.Epic;
 import tracker.model.Subtask;
 import tracker.model.Task;
@@ -59,7 +60,7 @@ class InMemoryTaskManagerIntegrityTest {
 
         assertNull(subtask.getEpic(),
                 "После удаления эпика подзадача не должна хранить старую ссылку на удалённый эпик");
-        assertNull(tm.getSubtask(subtask.getId()),
+        assertThrows(NotFoundException.class, () -> tm.getSubtask(subtask.getId()),
                 "Подзадача удалённого эпика должна исчезнуть из менеджера");
     }
 
