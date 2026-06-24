@@ -57,7 +57,11 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
                 case "id": id = in.nextInt(); break;
                 case "name": name = in.nextString(); break;
                 case "description":
-                    if (in.peek() == JsonToken.NULL) { in.nextNull(); } else { description = in.nextString(); }
+                    if (in.peek() == JsonToken.NULL) {
+                        in.nextNull();
+                    } else {
+                        description = in.nextString();
+                    }
                     break;
                 case "status":
                     if (in.peek() != JsonToken.NULL) status = TaskStatus.valueOf(in.nextString());

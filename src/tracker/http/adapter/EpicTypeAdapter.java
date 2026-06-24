@@ -5,11 +5,8 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import tracker.model.Epic;
-import tracker.model.TaskStatus;
 
 import java.io.IOException;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 public class EpicTypeAdapter extends TypeAdapter<Epic> {
 
@@ -59,7 +56,11 @@ public class EpicTypeAdapter extends TypeAdapter<Epic> {
                 case "id": id = in.nextInt(); break;
                 case "name": name = in.nextString(); break;
                 case "description":
-                    if (in.peek() == JsonToken.NULL) { in.nextNull(); } else { description = in.nextString(); }
+                    if (in.peek() == JsonToken.NULL) {
+                        in.nextNull();
+                    } else {
+                        description = in.nextString();
+                    }
                     break;
                 default: in.skipValue(); break;
             }
