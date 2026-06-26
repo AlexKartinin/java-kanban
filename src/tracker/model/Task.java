@@ -89,6 +89,48 @@ public class Task {
         return startTime.plus(duration);
     }
 
+    public static class Builder {
+        private final int id;
+        private final String name;
+        private String description = "";
+        private TaskStatus status = TaskStatus.NEW;
+        private Duration duration = null;
+        private LocalDateTime startTime = null;
+
+        public Builder(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder status(TaskStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder duration(Duration duration) {
+            this.duration = duration;
+            return this;
+        }
+
+        public Builder startTime(LocalDateTime startTime) {
+            this.startTime = startTime;
+            return this;
+        }
+
+        public Task build() {
+            Task task = new Task(id, name, description);
+            task.status = status;
+            task.duration = duration;
+            task.startTime = startTime;
+            return task;
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;

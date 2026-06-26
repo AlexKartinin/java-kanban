@@ -1,6 +1,7 @@
 package tracker.controllers;
 
 import org.junit.jupiter.api.Test;
+import tracker.exceptions.NotFoundException;
 import tracker.model.Epic;
 import tracker.model.Subtask;
 import tracker.model.Task;
@@ -52,18 +53,18 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void shouldReturnNullForUnknownTaskId() {
-        assertNull(tm.getTask(9999));
+    void shouldThrowNotFoundForUnknownTaskId() {
+        assertThrows(NotFoundException.class, () -> tm.getTask(9999));
     }
 
     @Test
-    void shouldReturnNullForUnknownEpicId() {
-        assertNull(tm.getEpic(9999));
+    void shouldThrowNotFoundForUnknownEpicId() {
+        assertThrows(NotFoundException.class, () -> tm.getEpic(9999));
     }
 
     @Test
-    void shouldReturnNullForUnknownSubtaskId() {
-        assertNull(tm.getSubtask(9999));
+    void shouldThrowNotFoundForUnknownSubtaskId() {
+        assertThrows(NotFoundException.class, () -> tm.getSubtask(9999));
     }
 
     // -------------------------------------------------------------------------
@@ -180,7 +181,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     void shouldRemoveTaskById() {
         Task task = tm.createTask(new Task(0, "T", "d"));
         tm.removeTaskById(task.getId());
-        assertNull(tm.getTask(task.getId()));
+        assertThrows(NotFoundException.class, () -> tm.getTask(task.getId()));
     }
 
     @Test
@@ -189,8 +190,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Subtask sub = tm.createSubtask(new Subtask(0, "S", "d", epic));
         tm.removeEpicById(epic.getId());
 
-        assertNull(tm.getEpic(epic.getId()));
-        assertNull(tm.getSubtask(sub.getId()));
+        assertThrows(NotFoundException.class, () -> tm.getEpic(epic.getId()));
+        assertThrows(NotFoundException.class, () -> tm.getSubtask(sub.getId()));
     }
 
     @Test
@@ -199,7 +200,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Subtask sub = tm.createSubtask(new Subtask(0, "S", "d", epic));
         tm.removeSubtaskById(sub.getId());
 
-        assertNull(tm.getSubtask(sub.getId()));
+        assertThrows(NotFoundException.class, () -> tm.getSubtask(sub.getId()));
         assertTrue(tm.getEpicSubtasks(epic.getId()).isEmpty());
     }
 

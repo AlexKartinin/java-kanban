@@ -1,5 +1,6 @@
 package tracker.controllers;
 
+import tracker.exceptions.NotFoundException;
 import tracker.model.Epic;
 import tracker.model.Subtask;
 import tracker.model.Task;
@@ -162,6 +163,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTask(int id) {
         Task task = tasks.get(id);
+        if (task == null) throw new NotFoundException("Задача с id=" + id + " не найдена");
         historyManager.add(task);
         return task;
     }
@@ -169,6 +171,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic getEpic(int id) {
         Epic epic = epics.get(id);
+        if (epic == null) throw new NotFoundException("Эпик с id=" + id + " не найден");
         historyManager.add(epic);
         return epic;
     }
@@ -176,6 +179,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask getSubtask(int id) {
         Subtask subtask = subtasks.get(id);
+        if (subtask == null) throw new NotFoundException("Подзадача с id=" + id + " не найдена");
         historyManager.add(subtask);
         return subtask;
     }
