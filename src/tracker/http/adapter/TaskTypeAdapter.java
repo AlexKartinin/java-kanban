@@ -80,10 +80,11 @@ public class TaskTypeAdapter extends TypeAdapter<Task> {
         }
         in.endObject();
 
-        Task task = new Task(id, name != null ? name : "", description != null ? description : "");
-        task.setStatus(status);
-        task.setDuration(duration);
-        task.setStartTime(startTime);
-        return task;
+        return new Task.Builder(id, name != null ? name : "")
+                .description(description != null ? description : "")
+                .status(status)
+                .duration(duration)
+                .startTime(startTime)
+                .build();
     }
 }
